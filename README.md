@@ -1,4 +1,4 @@
-# AMAC - Automatic Monitoring And Control
+# Bachelor - Automatic Monitoring And Control
 
 ## 📌 Introduktion
 The labs at the IT University (ITU) in Copenhagen support a wide range of activities, from student coursework to research and prototyping. They house diverse resources such as tools, electronic components, and other shared equipment. However, managing these resources is a significant challenge, as items are often misplaced or depleted without notice.
