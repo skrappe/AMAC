@@ -48,7 +48,7 @@ We will develop the system using an iterative approach:
 
 ## 👥 Bidragydere
 - **Morten Neergaard**
-- **Mikkel (tilføj efternavn)**
+- **Mikkel Toft**
   
 ## 📜 Licens
 Dette projekt er privat og til akademisk brug.
