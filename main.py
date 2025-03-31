@@ -4,9 +4,18 @@ from database import Base, engine, SessionLocal, Drawer
 from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
+from typing import List
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+
+
 
 app = FastAPI()
 Base.metadata.create_all(bind=engine)
+# Serve static files (like frontend)
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 
 class DrawerUpdate(BaseModel):
     drawer_id: str
@@ -22,6 +31,11 @@ def get_db():
         yield db
     finally:
         db.close()
+
+@app.get("/")
+def serve_frontend():
+    return FileResponse("static/index.html")        
+
 
 @app.post("/api/drawers/update")
 def update_drawer(update: DrawerUpdate, db: Session = Depends(get_db)):
@@ -42,3 +56,8 @@ def update_drawer(update: DrawerUpdate, db: Session = Depends(get_db)):
         db.add(drawer)
     db.commit()
     return {"message": f"Drawer {update.drawer_id} updated"}
+
+@app.get ("/api/drawers", response_model=List[DrawerUpdate])
+def get_all_drawers(db: Session = Depends(get_db)):
+        drawers = db.query(Drawer).all()
+        return drawers
