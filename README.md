@@ -1,55 +1,42 @@
-# Bachelor - Automatic Monitoring And Control
-https://chatgpt.com/g/g-67a9d06bd21c8191a56f16a93c5e0946-bachelor
+# ESP32 Drawer Monitoring System
 
-## 📌 Introduktion
-The labs at the IT University (ITU) in Copenhagen support a wide range of activities, from student coursework to research and prototyping. They house diverse resources such as tools, electronic components, and other shared equipment. However, managing these resources is a significant challenge, as items are often misplaced or depleted without notice.
+This project provides a backend and dashboard for monitoring electronic component drawers using ESP32 Wi-Fi-enabled sensors.
 
-To address these challenges, we propose the development of a **"keep order system"** for ITU’s lab spaces. This system will integrate embedded hardware and software to track resources, notify supervisors when supplies need replenishing, and provide a real-time overview of lab resources. 
+## 📦 Features
 
-## ❌ Problemformulering
-ITU’s lab spaces currently rely on manual or ad-hoc methods to manage shared resources, leading to several inefficiencies:
+- FastAPI backend to receive drawer updates
+- SQLite database for storing current drawer status
+- HTML/JS frontend dashboard served from the same server
+- Simulation script to generate fake ESP32 drawer data
 
-### 🔴 **1. Resource Misplacement and Depletion**
-- **Misplacement:** Tools and components are easily lost, disrupting academic work.
-- **Depletion:** Consumables (e.g., electronic parts) may run out unexpectedly, causing delays in coursework and research.
+---
 
-### 🔴 **2. Equipment Tracking and Maintenance**
-- **Unscheduled Downtime:** Equipment failures are only noticed when they disrupt student projects or research.
-- **Reactive Maintenance:** Problems are often addressed too late, leading to inefficiencies and higher costs.
+## 🚀 Getting Started
 
-A structured system is needed to improve **resource tracking, efficiency, and lab operations at ITU**.
+### 1. Clone the Repository
 
-## 🛠 **Metodologi**
-We will develop the system using an iterative approach:
 
-### **📖 1. Research & Requirement Gathering**
-- 📚 **Literature Review:** Investigate existing lab-management tools.
-- 🎤 **Stakeholder Interviews:** Gather insights from ITU lab staff and students.
-- 🎯 **Problem Refinement:** Prioritize features based on findings.
+git clone <your-repo-url>
+cd <your-repo-folder>
 
-### **📝 2. Conceptual Design & Prototyping**
-- 🔧 **System Architecture Draft:** Develop a high-level design for tracking.
-- 🏗 **Prototyping:** Create a proof-of-concept.
-- 🔄 **Iterative Feedback:** Incorporate input from ITU stakeholders.
+### 2. Create a Virtual Environment (Optional but Recommended)
+python -m venv venv
+source venv/bin/activate         # On Windows: venv\Scripts\activate
 
-### **🖥️ 3. Implementation & Integration**
-- 🏗 **Modular Development:** Incrementally build the system.
-- 🔌 **Hardware Integration:** Ensure reliable communication between hardware and software.
-- 👥 **Collaboration:** Use GitHub for version control.
+### 3. Install Dependencies
+pip install -r requirements.txt
 
-### **✅ 4. Testing & Evaluation**
-- 🏫 **User Trials:** Conduct testing in the ITU lab.
-- 🔄 **Refinement:** Improve usability based on feedback.
-- 📑 **Documentation:** Create guides for system setup and maintenance.
+### 4. Run the Backend Server
+uvicorn main:app --reload
 
-## 💾 Teknologier
-- **Embedded hardware:** (specificeres senere)
-- **Software Stack:** Python, C++, Home Assistant, API-integrationer
-- **Version Control:** GitHub
+Visit the dashboard in your browser:
+👉 http://127.0.0.1:8000/
 
-## 👥 Bidragydere
-- **Morten Neergaard**
-- **Mikkel Toft**
-  
-## 📜 Licens
-Dette projekt er privat og til akademisk brug.
+API docs (Swagger):
+👉 http://127.0.0.1:8000/docs
+
+### 5. Simulate Sensor Data (Optional)
+This script mimics ESP32 sensors sending updates:
+
+python simulate_updates.py
+It will send multiple POST requests to /api/drawers/update with randomized data.
