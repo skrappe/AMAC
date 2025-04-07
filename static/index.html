@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Drawer Status Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #ffffff; }
+    .empty { background-color: #ffe0e0; }
+    .occupied { background-color: #e0ffe0; }
+  </style>
+</head>
+<body>
+  <h1>Drawer Status Dashboard</h1>
+  <table id="drawerTable">
+    <thead>
+      <tr>
+        <th>Drawer ID</th>
+        <th>Sensor Type</th>
+        <th>Status</th>
+        <th>Conductive</th>
+        <th>Last Updated</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    async function fetchDrawers() {
+      const response = await fetch('http://127.0.0.1:8000/api/drawers');
+      const data = await response.json();
+      const tbody = document.querySelector("#drawerTable tbody");
+      tbody.innerHTML = "";
+
+      data.forEach(drawer => {
+        const row = document.createElement("tr");
+        row.className = drawer.status === "empty" ? "empty" : "occupied";
+        row.innerHTML = `
+          <td>${drawer.drawer_id}</td>
+          <td>${drawer.sensor_type}</td>
+          <td>${drawer.status}</td>
+          <td>${drawer.conductive ? "Yes" : "No"}</td>
+          <td>${new Date(drawer.last_updated).toLocaleString()}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    fetchDrawers();
+    setInterval(fetchDrawers, 10000); // Refresh every 10 seconds
+  </script>
+</body>
+</html>
