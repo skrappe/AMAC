@@ -29,7 +29,8 @@
 
   <script>
     async function fetchDrawers() {
-      const response = await fetch('https://amac.onrender.com/api/drawers');
+      const response = await fetch('https://amac.onrender.com/api/drawers',
+       { cache: 'no-store'});
       const data = await response.json();
       const tbody = document.querySelector("#drawerTable tbody");
       tbody.innerHTML = "";
