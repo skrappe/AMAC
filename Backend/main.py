@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
-from Backend.database import Base, engine, SessionLocal, Drawer
+from database import Base, engine, SessionLocal, Drawer
 from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional

@@ -7,3 +7,4 @@ libdeps/
 *.elf
 *.bin
 secrets.h
+venv
