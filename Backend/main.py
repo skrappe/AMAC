@@ -37,7 +37,7 @@ def serve_frontend():
     return FileResponse("static/index.html")        
 
 
-@app.post("/api/drawers/update")
+@app.post("/api/drawers/update", response_model=DrawerUpdate)
 def update_drawer(update: DrawerUpdate, db: Session = Depends(get_db)):
     drawer = db.query(Drawer).filter(Drawer.drawer_id == update.drawer_id).first()
     if drawer:

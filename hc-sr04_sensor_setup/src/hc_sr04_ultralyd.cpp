@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <WiFi.h>        // Required for WiFi functionality
-#include <HTTPClient.h>  // Required for making HTTP requests
+#include <HTTPClient.h> // Required for making HTTP requests (ensure ESP32 core is installed)
 #include <ArduinoJson.h> // Required for creating JSON payloads
 //#include <secrets.h>
 
@@ -9,7 +9,7 @@ const char *ssid = "sensors";      // Your WiFi Network Name
 const char *password = "vFBaDdtH"; // Your WiFi Password
 
 // --- Backend Configuration ---
-const char *serverUrl = "https://amac.onrender.com/api/drawers/update"; // Your Backend URL
+const char *serverUrl = "http://amac.onrender.com/api/drawers/update"; // Your Backend URL
 
 // --- Sensor Configuration ---
 const int NUM_SENSORS = 4;
@@ -93,6 +93,8 @@ void sendStatus(int sensorIndex, String status)
     doc["drawer_id"] = drawerId;
     doc["sensor_type"] = "ultrasound";
     doc["status"] = status; // "empty" or "item_detected"
+    doc["conductive"] = false; // Eller true hvis relevant
+
 
     String jsonPayload;
     serializeJson(doc, jsonPayload); // Convert JSON document to String
