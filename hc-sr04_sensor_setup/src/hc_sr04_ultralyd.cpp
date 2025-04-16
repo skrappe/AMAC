@@ -2,7 +2,7 @@
 #include <WiFi.h>        // Required for WiFi functionality
 #include <HTTPClient.h>  // Required for making HTTP requests
 #include <ArduinoJson.h> // Required for creating JSON payloads
-#include <secrets.h>
+//#include <secrets.h>
 
 // --- WiFi Configuration ---
 const char *ssid = "sensors";      // Your WiFi Network Name
