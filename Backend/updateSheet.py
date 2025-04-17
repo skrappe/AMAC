@@ -5,7 +5,7 @@ from google.oauth2.service_account import Credentials
 from datetime import datetime
 
 # Constants
-CREDENTIALS_PATH = "Backend/credentials/amac-credentials.json"
+CREDENTIALS_PATH = "/etc/secrets/credentials.json"
 SPREADSHEET_ID = "13REM3pUdVp14TV_xDA7fzTK30Rzu5vsCnQXgik9GZgs"
 SHEET_NAME = "AMAC - Parts to buy"
 
