@@ -70,7 +70,14 @@ def update_drawer(update: DrawerUpdate, db: Session = Depends(get_db)):
     )
 
     print("Update complete")
-    return {"message": f"Drawer {update.drawer_id} updated"}
+    return DrawerUpdate(
+    drawer_id=drawer.drawer_id,
+    sensor_type=drawer.sensor_type,
+    status=drawer.status,
+    conductive=drawer.conductive,
+    last_updated=drawer.last_updated
+)
+
 
 
 @app.get ("/api/drawers", response_model=List[DrawerUpdate])
