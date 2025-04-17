@@ -7,6 +7,7 @@ from typing import Optional
 from typing import List
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from updateSheet import log_drawer_update
 
 
 
@@ -39,13 +40,17 @@ def serve_frontend():
 
 @app.post("/api/drawers/update", response_model=DrawerUpdate)
 def update_drawer(update: DrawerUpdate, db: Session = Depends(get_db)):
+    print("Received update:", update)
+
     drawer = db.query(Drawer).filter(Drawer.drawer_id == update.drawer_id).first()
     if drawer:
+        print("Drawer found, updating...")
         drawer.sensor_type = update.sensor_type
         drawer.status = update.status
         drawer.conductive = update.conductive
         drawer.last_updated = update.last_updated or datetime.utcnow()
     else:
+        print("Drawer not found, creating new...")
         drawer = Drawer(
             drawer_id=update.drawer_id,
             sensor_type=update.sensor_type,
@@ -55,7 +60,18 @@ def update_drawer(update: DrawerUpdate, db: Session = Depends(get_db)):
         )
         db.add(drawer)
     db.commit()
+
+    print("Calling log_drawer_update...")
+    log_drawer_update(
+        drawer_id=update.drawer_id,
+        item_name="ESP32 WROOM",
+        sr_code="SR-123456",
+        status=update.status
+    )
+
+    print("Update complete")
     return {"message": f"Drawer {update.drawer_id} updated"}
+
 
 @app.get ("/api/drawers", response_model=List[DrawerUpdate])
 def get_all_drawers(db: Session = Depends(get_db)):
