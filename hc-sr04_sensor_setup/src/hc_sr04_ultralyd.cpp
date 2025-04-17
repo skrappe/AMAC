@@ -2,9 +2,11 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 
+void sendStatus(String status);
+
 // WiFi info
-const char* ssid = "sensors";
-const char* password = "vFBaDdtH";
+const char* ssid = "N&N";
+const char* password = "60209767";
 
 // Backend URL
 const char* serverUrl = "https://amac.onrender.com/api/drawers/update";
