@@ -5,7 +5,7 @@ from google.oauth2.service_account import Credentials
 from datetime import datetime
 
 # --- Credentials setup ---
-CREDENTIALS_PATH = os.getenv("GOOGLE_CREDENTIALS_PATH", "Backend/credentials/amac-credentials.json")
+CREDENTIALS_PATH = os.getenv("GOOGLE_CREDENTIALS_PATH", "Backend/credentials/amac-credentials.json").strip()
 scopes = ["https://www.googleapis.com/auth/spreadsheets"]
 
 credentials = Credentials.from_service_account_file(CREDENTIALS_PATH, scopes=scopes)
