@@ -5,8 +5,8 @@
 void sendStatus(String status);
 
 // WiFi info
-const char* ssid = "N&N";
-const char* password = "60209767";
+const char* ssid = "sensors";
+const char* password = "vFBaDdtH";
 
 // Backend URL
 const char* serverUrl = "https://amac.onrender.com/api/drawers/update";
