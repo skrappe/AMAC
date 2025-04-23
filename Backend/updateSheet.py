@@ -19,7 +19,19 @@ sheet = gc.open_by_key(SPREADSHEET_ID).worksheet(SHEET_NAME)
 # --- Logging function ---
 def log_drawer_update(drawer_id, item_name, sr_code, status):
     now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-    new_row = [now, drawer_id, item_name, sr_code, status]
-    print(f"Logging update: {new_row}")
-    sheet.append_row(new_row)
+    all_records = sheet.get_all_records()
+
+    row_found = False
+    for idx, record in enumerate(all_records, start=2):  # Header i række 1
+        if record['Drawer ID'].strip() == drawer_id.strip():
+            print(f"🔄 Opdaterer række {idx} for {drawer_id}")
+            # A: Drawer ID, B: Item, C: SR-code, D: Status, E: Timestamp
+            sheet.update(f"A{idx}:E{idx}", [[now, drawer_id, item_name, sr_code, status]])
+            row_found = True
+            break
+
+    if not row_found:
+        print(f"➕ Tilføjer ny række for {drawer_id}")
+        sheet.append_row([now, drawer_id, item_name, sr_code, status])
+
 
