@@ -2,8 +2,6 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 
-void sendStatus(String status);
-
 // WiFi info
 const char* ssid = "sensors";
 const char* password = "vFBaDdtH";
@@ -11,30 +9,26 @@ const char* password = "vFBaDdtH";
 // Backend URL
 const char* serverUrl = "https://amac.onrender.com/api/drawers/update";
 
-// Ultrasonic pins
-const int trigPin = 5;
-const int echoPin = 18;
+// --- Sensor Pins ---
+const int NUM_SENSORS = 4;
+const int trigPins[NUM_SENSORS] = {2, 14, 17, 18};
+const int echoPins[NUM_SENSORS] = {15, 12, 16, 19};
 
-// Measurement config
-const long baseCaseDuration = 521;  // "Tom skuffe"
-const long tolerance = 5;
-const int numberOfSamples = 100;
-const unsigned long pulseTimeout = 10000;
-const int sampleDelay = 20;
-const int cycleDelay = 500;
+// --- Sensor Config ---
+const long baseCaseDurations[NUM_SENSORS] = {521, 530, 515, 545};  // Kalibrer disse!
+const long tolerances[NUM_SENSORS] = {25, 25, 25, 25};
 
-const long emptyLowerBound = baseCaseDuration - tolerance;
-const long emptyUpperBound = baseCaseDuration + tolerance;
+long emptyLowerBounds[NUM_SENSORS];
+long emptyUpperBounds[NUM_SENSORS];
 
-long averageDuration;
-String lastStatus = "";
-unsigned long lastSent = 0;
+String lastStatus[NUM_SENSORS] = {"", "", "", ""};
+unsigned long lastSent[NUM_SENSORS] = {0, 0, 0, 0};
 const unsigned long sendInterval = 1000;
 
-// Reconnect WiFi if needed
+// --- WiFi reconnect ---
 void reconnectWiFi() {
   if (WiFi.status() != WL_CONNECTED) {
-    Serial.println("🔄 WiFi forbindelse tabt. Forsøger genforbindelse...");
+    Serial.println("🔄 WiFi genforbindelse...");
     WiFi.disconnect();
     WiFi.begin(ssid, password);
     int attempts = 0;
@@ -47,86 +41,16 @@ void reconnectWiFi() {
   }
 }
 
-void setup() {
-  Serial.begin(115200);
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
-  digitalWrite(trigPin, LOW);
-
-  WiFi.begin(ssid, password);
-  Serial.print("🔌 Forbinder til WiFi");
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("\n✅ WiFi forbundet!");
-  Serial.print("📡 IP: ");
-  Serial.println(WiFi.localIP());
-
-  Serial.println("🛠️ Setup complete. Starter målinger...");
-  Serial.print("📏 Tom skuffe varighed: ");
-  Serial.println(baseCaseDuration);
-  Serial.print("🎯 Tolerance: +/- ");
-  Serial.println(tolerance);
-  Serial.print("📐 Range: [");
-  Serial.print(emptyLowerBound);
-  Serial.print(", ");
-  Serial.print(emptyUpperBound);
-  Serial.println("]");
-  Serial.println("──────────────────────────────");
-}
-
-void loop() {
-  long totalDuration = 0;
-  int validSamples = 0;
-
-  for (int i = 0; i < numberOfSamples; i++) {
-    digitalWrite(trigPin, LOW);
-    delayMicroseconds(2);
-    digitalWrite(trigPin, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(trigPin, LOW);
-
-    long duration = pulseIn(echoPin, HIGH, pulseTimeout);
-    if (duration > 0) {
-      totalDuration += duration;
-      validSamples++;
-    }
-    delay(sampleDelay);
-  }
-
-  if (validSamples > 0) {
-    averageDuration = totalDuration / validSamples;
-    String status = (averageDuration >= emptyLowerBound && averageDuration <= emptyUpperBound)
-                      ? "empty"
-                      : "item_detected";
-
-    Serial.print("📏 Gennemsnit: ");
-    Serial.print(averageDuration);
-    Serial.print(" us → ");
-    Serial.println(status);
-
-    if (status != lastStatus && millis() - lastSent > sendInterval) {
-      reconnectWiFi();  // <–– forsøg automatisk genforbindelse
-      sendStatus(status);
-      lastStatus = status;
-      lastSent = millis();
-    }
-  } else {
-    Serial.println("⚠️ Ingen gyldige målinger.");
-  }
-
-  delay(cycleDelay);
-}
-
-void sendStatus(String status) {
+// --- Send status for each sensor ---
+void sendStatus(int sensorIndex, String status) {
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     http.begin(serverUrl);
     http.addHeader("Content-Type", "application/json");
 
     StaticJsonDocument<256> doc;
-    doc["drawer_id"] = "drawer_ultra_01";
+    String drawerId = "drawer_ultra_s" + String(sensorIndex + 1);
+    doc["drawer_id"] = drawerId;
     doc["sensor_type"] = "ultrasound";
     doc["status"] = status;
     doc["conductive"] = false;
@@ -135,11 +59,71 @@ void sendStatus(String status) {
     serializeJson(doc, json);
 
     int httpCode = http.POST(json);
-    Serial.print("🌐 HTTP POST: ");
+    Serial.print("🌐 Sensor "); Serial.print(sensorIndex + 1); Serial.print(" HTTP POST: ");
     Serial.println(httpCode);
 
     http.end();
   } else {
     Serial.println("🚫 WiFi ikke forbundet under sendStatus!");
   }
+}
+
+void setup() {
+  Serial.begin(115200);
+  WiFi.begin(ssid, password);
+  Serial.print("🔌 Forbinder til WiFi");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\n✅ WiFi forbundet!");
+
+  for (int i = 0; i < NUM_SENSORS; i++) {
+    pinMode(trigPins[i], OUTPUT);
+    pinMode(echoPins[i], INPUT);
+    emptyLowerBounds[i] = baseCaseDurations[i] - tolerances[i];
+    emptyUpperBounds[i] = baseCaseDurations[i] + tolerances[i];
+  }
+  Serial.println("🛠️ Multi-sensor setup complete.");
+}
+
+void loop() {
+  for (int i = 0; i < NUM_SENSORS; i++) {
+    long totalDuration = 0;
+    int validSamples = 0;
+
+    for (int s = 0; s < 50; s++) {  // 50 samples pr sensor
+      digitalWrite(trigPins[i], LOW);
+      delayMicroseconds(2);
+      digitalWrite(trigPins[i], HIGH);
+      delayMicroseconds(10);
+      digitalWrite(trigPins[i], LOW);
+
+      long duration = pulseIn(echoPins[i], HIGH, 10000);
+      if (duration > 0) {
+        totalDuration += duration;
+        validSamples++;
+      }
+      delay(10);
+    }
+
+    if (validSamples > 0) {
+      long avgDuration = totalDuration / validSamples;
+      String status = (avgDuration >= emptyLowerBounds[i] && avgDuration <= emptyUpperBounds[i])
+                      ? "empty"
+                      : "item_detected";
+
+      Serial.print("📏 Sensor "); Serial.print(i + 1); Serial.print(": ");
+      Serial.print(avgDuration); Serial.print(" us → "); Serial.println(status);
+
+      if (status != lastStatus[i] && millis() - lastSent[i] > sendInterval) {
+        reconnectWiFi();
+        sendStatus(i, status);
+        lastStatus[i] = status;
+        lastSent[i] = millis();
+      }
+    }
+  }
+
+  delay(500);  // Delay mellem sensorrunder
 }
