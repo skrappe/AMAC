@@ -40,3 +40,7 @@ This script mimics ESP32 sensors sending updates:
 
 python simulate_updates.py
 It will send multiple POST requests to /api/drawers/update with randomized data.
+
+### PlatformIO 
+pio run --target upload 
+pio device monitor
