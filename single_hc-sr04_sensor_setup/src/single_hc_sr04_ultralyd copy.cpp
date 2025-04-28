@@ -14,10 +14,10 @@ const char *serverUrl = "https://amac.onrender.com/api/drawers/update";
 const int trigPin = 25;
 const int echoPin = 27;
 
-const long baseCaseDuration = 551; // baseline measurement when empty
+const long baseCaseDuration = 536; // baseline measurement when empty
 const long tolerance = 5;          // acceptable variation
 const String drawerId = "001";     // unique ID for this drawer
-const String itemName = "MOSFET";
+const String itemName = "REG 3.3V";
 
 const unsigned long sendInterval = 1000; // time between status updates
 // ----------------------------------------------------------- //

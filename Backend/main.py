@@ -75,7 +75,8 @@ def update_drawer(update: DrawerUpdate, db: Session = Depends(get_db)):
     print("Update complete")
     return DrawerUpdate(
     drawer_id=drawer.drawer_id,
-    sensor_type=drawer.sensor_type,
+    item_name=drawer.item_name,
+    sr_code=update.sr_code,
     status=drawer.status,
     last_updated=drawer.last_updated
 )
