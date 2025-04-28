@@ -12,16 +12,16 @@ Base.metadata.create_all(engine)
 print("Database tables creation attempted.")
 
 # If you need to drop tables before creating (BE CAREFUL - DATA LOSS!)
-try:
-    print("Attempting to drop all database tables...")
-    Base.metadata.drop_all(engine)
-    print("Database tables dropped.")
-except Exception as e:
-    print(f"Error dropping tables: {e}")
+# try:
+#     print("Attempting to drop all database tables...")
+#     Base.metadata.drop_all(engine)
+#     print("Database tables dropped.")
+# except Exception as e:
+#     print(f"Error dropping tables: {e}")
 
-try:
-    print("Attempting to create database tables again...")
-    Base.metadata.create_all(engine)
-    print("Database tables created.")
-except Exception as e:
-    print(f"Error creating tables: {e}")
+# try:
+#     print("Attempting to create database tables again...")
+#     Base.metadata.create_all(engine)
+#     print("Database tables created.")
+# except Exception as e:
+#     print(f"Error creating tables: {e}")
