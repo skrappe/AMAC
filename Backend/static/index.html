@@ -17,11 +17,11 @@
   <table id="drawerTable">
     <thead>
       <tr>
+        <th>Time Stamp</th>
         <th>Drawer ID</th>
-        <th>Sensor Type</th>
+        <th>Item Name</th>
+        <th>SR-Code</th>
         <th>Status</th>
-        <th>Conductive</th>
-        <th>Last Updated</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -39,11 +39,11 @@
         const row = document.createElement("tr");
         row.className = drawer.status === "empty" ? "empty" : "occupied";
         row.innerHTML = `
-          <td>${drawer.drawer_id}</td>
-          <td>${drawer.sensor_type}</td>
-          <td>${drawer.status}</td>
-          <td>${drawer.conductive ? "Yes" : "No"}</td>
           <td>${new Date(drawer.last_updated).toLocaleString()}</td>
+          <td>${drawer.drawer_id}</td>
+          <td>${drawer.item_name}</td>
+          <td>${drawer.sr_code}</td>
+          <td>${drawer.status ? "Item detected" : "Empty or very few"}</td>
         `;
         tbody.appendChild(row);
       });

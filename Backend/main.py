@@ -21,8 +21,9 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 class DrawerUpdate(BaseModel):
     drawer_id: str
     sensor_type: str
+    item_name: str
+    sr_code: str
     status: str
-    conductive: bool
     last_updated: Optional[datetime] = None
 
 # Dependency to get DB session
@@ -47,15 +48,17 @@ def update_drawer(update: DrawerUpdate, db: Session = Depends(get_db)):
         print("Drawer found, updating...")
         drawer.sensor_type = update.sensor_type
         drawer.status = update.status
-        drawer.conductive = update.conductive
+        drawer.item_name = update.item_name
+        drawer.sr_code = update.sr_code
         drawer.last_updated = update.last_updated or datetime.utcnow()
     else:
         print("Drawer not found, creating new...")
         drawer = Drawer(
             drawer_id=update.drawer_id,
             sensor_type=update.sensor_type,
+            item_name=update.item_name,
+            sr_code=update.sr_code,
             status=update.status,
-            conductive=update.conductive,
             last_updated=update.last_updated or datetime.utcnow()
         )
         db.add(drawer)
@@ -64,8 +67,8 @@ def update_drawer(update: DrawerUpdate, db: Session = Depends(get_db)):
     print("Calling log_drawer_update...")
     log_drawer_update(
         drawer_id=update.drawer_id,
-        item_name="ESP32 WROOM",
-        sr_code="SR-123456",
+        item_name=update.item_name,
+        sr_code=update.sr_code,
         status=update.status
     )
 
@@ -74,7 +77,6 @@ def update_drawer(update: DrawerUpdate, db: Session = Depends(get_db)):
     drawer_id=drawer.drawer_id,
     sensor_type=drawer.sensor_type,
     status=drawer.status,
-    conductive=drawer.conductive,
     last_updated=drawer.last_updated
 )
 
