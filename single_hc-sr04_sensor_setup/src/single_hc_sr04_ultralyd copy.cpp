@@ -28,6 +28,29 @@ long emptyUpperBound = baseCaseDuration + tolerance;
 String lastStatus = "";
 unsigned long lastSent = 0;
 
+void sendLog(String logMessage)
+{
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    HTTPClient http;
+    http.begin("https://amac.onrender.com/");
+    http.addHeader("Content-Type", "application/json");
+
+    StaticJsonDocument<256> doc;
+    doc["log"] = logMessage;
+
+    String json;
+    serializeJson(doc, json);
+
+    int httpCode = http.POST(json);
+    http.end();
+  }
+  else
+  {
+    Serial.println("🚫 WiFi ikke forbundet under logsend!");
+  }
+}
+
 // --- WiFi reconnect ---
 void reconnectWiFi()
 {
@@ -86,12 +109,15 @@ void setup()
   pinMode(echoPin, INPUT);
 
   Serial.print("🔌 Connecting to WiFi");
+  sendLog("Connecting to WiFi");
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED)
   {
     delay(500);
     Serial.print(".");
   }
+  sendLog("WiFi Connected");
+
   Serial.println("\n✅ WiFi Connected!");
 }
 
@@ -129,6 +155,8 @@ void loop()
     Serial.print(avgDuration);
     Serial.print(" us → ");
     Serial.println(status);
+    sendLog("avg Duration: ");
+    sendLog(avgDuration);
 
     if (status != lastStatus && millis() - lastSent > sendInterval)
     {
