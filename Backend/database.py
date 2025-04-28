@@ -17,7 +17,6 @@ class Drawer(Base):
     __tablename__ = "drawers"
 
     drawer_id = Column(String, primary_key=True, index=True)
-    sensor_type = Column(String)
     item_name = Column(String)
     sr_code = Column(String)
     status = Column(String)

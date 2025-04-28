@@ -20,7 +20,6 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 class DrawerUpdate(BaseModel):
     drawer_id: str
-    sensor_type: str
     item_name: str
     sr_code: str
     status: str
@@ -46,7 +45,6 @@ def update_drawer(update: DrawerUpdate, db: Session = Depends(get_db)):
     drawer = db.query(Drawer).filter(Drawer.drawer_id == update.drawer_id).first()
     if drawer:
         print("Drawer found, updating...")
-        drawer.sensor_type = update.sensor_type
         drawer.status = update.status
         drawer.item_name = update.item_name
         drawer.sr_code = update.sr_code
@@ -55,7 +53,6 @@ def update_drawer(update: DrawerUpdate, db: Session = Depends(get_db)):
         print("Drawer not found, creating new...")
         drawer = Drawer(
             drawer_id=update.drawer_id,
-            sensor_type=update.sensor_type,
             item_name=update.item_name,
             sr_code=update.sr_code,
             status=update.status,
