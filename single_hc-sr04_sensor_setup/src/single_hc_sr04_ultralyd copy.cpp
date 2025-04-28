@@ -33,7 +33,7 @@ void sendLog(String logMessage)
   if (WiFi.status() == WL_CONNECTED)
   {
     HTTPClient http;
-    http.begin("https://amac.onrender.com/");
+    http.begin("https://amac.onrender.com/api/log");
     http.addHeader("Content-Type", "application/json");
 
     StaticJsonDocument<256> doc;
@@ -151,12 +151,13 @@ void loop()
                         ? "empty"
                         : "item_detected";
 
-    Serial.print("📏 Avg Duration: ");
-    Serial.print(avgDuration);
-    Serial.print(" us → ");
-    Serial.println(status);
-    sendLog("avg Duration: ");
-    sendLog(avgDuration);
+    String statusMsg = "Sensor 1: " + String(avgDuration) + " us → " + status;
+
+    // Serial.print("📏 Avg Duration: ");
+    // Serial.print(avgDuration);
+    // Serial.print(" us → ");
+    Serial.println(statusMsg);
+    sendLog(statusMsg);
 
     if (status != lastStatus && millis() - lastSent > sendInterval)
     {

@@ -16,7 +16,8 @@ app = FastAPI()
 Base.metadata.create_all(bind=engine)
 # Serve static files (like frontend)
 app.mount("/static", StaticFiles(directory="static"), name="static")
-
+class LogMessage(Basemodel):
+    log: str
 
 class DrawerUpdate(BaseModel):
     drawer_id: str
@@ -35,7 +36,26 @@ def get_db():
 
 @app.get("/")
 def serve_frontend():
-    return FileResponse("static/index.html")        
+    return FileResponse("static/index.html")    
+
+@app.post("/api/log")
+async def receive_log(log_entry: LogMessage):
+    """
+    Receives a simple log message from a client (e.g., microcontroller)
+    and outputs it to the application logs.
+    """
+    # This is where you output the received log message to standard output/error
+    # so it appears in your Render logs dashboard.
+    print(f"MICROCONTROLLER LOG: {log_entry.log}")
+
+    # You can add more sophisticated logging here using the 'logging' module if you prefer
+    # import logging
+    # logger = logging.getLogger(__name__)
+    # logger.info(f"Microcontroller Log: {log_entry.log}")
+
+
+    # You can return a simple success response
+    return {"status": "Log message received successfully"}    
 
 
 @app.post("/api/drawers/update", response_model=DrawerUpdate)
