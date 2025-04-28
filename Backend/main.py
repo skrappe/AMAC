@@ -16,7 +16,7 @@ app = FastAPI()
 Base.metadata.create_all(bind=engine)
 # Serve static files (like frontend)
 app.mount("/static", StaticFiles(directory="static"), name="static")
-class LogMessage(Basemodel):
+class LogMessage(BaseModel):
     log: str
 
 class DrawerUpdate(BaseModel):
