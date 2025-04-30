@@ -30,17 +30,20 @@ def generate_html(drawers):
 # --- Send Email ---
 def send_monthly_email(html_content):
     message = Mail(
-        from_email='test@sendgrid.me',
+        from_email='skrappe9@hotmail.com',
         to_emails='skrappe9@hotmail.com',
         subject='Monthly Drawer Status Report',
-        html_content=html_content
+        html_content=html_content,
+        plain_text_content="Se status for alle skuffer i den vedhæftede HTML-tabel."
     )
+
     try:
         sg = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
         response = sg.send(message)
         print(f"✅ Monthly mail sent! Status: {response.status_code}")
     except Exception as e:
         print(f"❌ Error on send: {e}")
+
 
 # --- Main ---
 if __name__ == "__main__":
