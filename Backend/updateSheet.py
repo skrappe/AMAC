@@ -22,10 +22,12 @@ def log_drawer_update(drawer_id, item_name, sr_code, status):
     all_records = sheet.get_all_records()
 
     row_found = False
+    incoming_id = drawer_id.strip().lower()
+
     for idx, record in enumerate(all_records, start=2):  # Header i række 1
-        if str(record['Drawer ID']).strip() == drawer_id.strip():
+        existing_id = str(record.get('Drawer ID', '')).strip().lower()
+        if existing_id == incoming_id:
             print(f"🔄 Opdaterer række {idx} for {drawer_id}")
-            # A: Now, B: Drawer ID, C: Item, D: SR-code, E: Status
             sheet.update(f"A{idx}:E{idx}", [[now, drawer_id, item_name, sr_code, status]])
             row_found = True
             break
@@ -33,5 +35,4 @@ def log_drawer_update(drawer_id, item_name, sr_code, status):
     if not row_found:
         print(f"➕ Tilføjer ny række for {drawer_id}")
         sheet.append_row([now, drawer_id, item_name, sr_code, status])
-
 
