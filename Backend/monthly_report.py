@@ -30,7 +30,7 @@ def generate_html(drawers):
 # --- Send Email ---
 def send_monthly_email(html_content):
     message = Mail(
-        from_email='monie@itu.dk',
+        from_email='test@sendgrid.me',
         to_emails='monie@itu.dk',
         subject='Monthly Drawer Status Report',
         html_content=html_content
