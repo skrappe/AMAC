@@ -27,4 +27,4 @@ jobs:
         env:
           SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
         run: |
-          python monthly_report.py
+          python Backend/monthly_report.py
