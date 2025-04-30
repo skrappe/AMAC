@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from database import Base, engine, SessionLocal, Drawer
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from typing import Optional, List
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -74,7 +74,7 @@ async def receive_log(log_entry: LogMessage):
     # You can return a simple success response
     return {"status": "Log message received successfully"}    
 
-
+time_zone = timezone(timedelta(hours=2))
 # --- API Endpoint ---
 @app.post("/api/drawers/update", response_model=DrawerUpdate)
 def update_drawer(update: DrawerUpdate, db: Session = Depends(get_db)):
@@ -86,7 +86,7 @@ def update_drawer(update: DrawerUpdate, db: Session = Depends(get_db)):
         drawer.status = update.status
         drawer.item_name = update.item_name
         drawer.sr_code = update.sr_code
-        drawer.last_updated = update.last_updated or datetime.utcnow()
+        drawer.last_updated = update.last_updated or datetime.now(time_zone)
     else:
         print("Drawer not found, creating new...")
         drawer = Drawer(
@@ -94,7 +94,7 @@ def update_drawer(update: DrawerUpdate, db: Session = Depends(get_db)):
             item_name=update.item_name,
             sr_code=update.sr_code,
             status=update.status,
-            last_updated=update.last_updated or datetime.utcnow()
+            last_updated=update.last_updated or datetime.now(time_zone)
         )
         db.add(drawer)
     db.commit()

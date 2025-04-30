@@ -2,8 +2,9 @@
 import os
 import gspread
 from google.oauth2.service_account import Credentials
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
+time_zone = timezone(timedelta(hours=2))
 # --- Credentials setup ---
 CREDENTIALS_PATH = os.getenv("GOOGLE_CREDENTIALS_PATH", "Backend/credentials/amac-credentials.json").strip()
 scopes = ["https://www.googleapis.com/auth/spreadsheets"]
@@ -18,7 +19,7 @@ sheet = gc.open_by_key(SPREADSHEET_ID).worksheet(SHEET_NAME)
 
 # --- Logging function ---
 def log_drawer_update(drawer_id, item_name, sr_code, status):
-    now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    now = datetime.now(time_zone).strftime("%Y-%m-%d %H:%M:%S")
     all_records = sheet.get_all_records()
 
     row_found = False

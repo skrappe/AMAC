@@ -10,14 +10,14 @@ const char *password = "vFBaDdtH";
 // Backend URL
 const char *serverUrl = "https://amac.onrender.com/api/drawers/update";
 
-// Sensor Settings (CHANGE THESE!)
+// Sensor Settings
 const int trigPin = 25;
 const int echoPin = 27;
 
-const long baseCaseDuration = 536; // baseline measurement when empty
+const long baseCaseDuration = 538; // baseline measurement when empty
 const long tolerance = 5;          // acceptable variation
-const String drawerId = "001";     // unique ID for this drawer
-const String itemName = "REG 3.3V";
+const String drawerId = "002";     // unique ID for this drawer
+const String itemName = "MOSFET";
 
 const unsigned long sendInterval = 1000; // time between status updates
 // ----------------------------------------------------------- //
@@ -151,7 +151,7 @@ void loop()
                         ? "empty"
                         : "item_detected";
 
-    String statusMsg = "Sensor 1: " + String(avgDuration) + " us → " + status;
+    String statusMsg = "Sensor " + itemName + ": " + String(avgDuration) + " us → " + status;
 
     // Serial.print("📏 Avg Duration: ");
     // Serial.print(avgDuration);
