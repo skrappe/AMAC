@@ -3,22 +3,38 @@ from sqlalchemy.orm import Session
 from database import Base, engine, SessionLocal, Drawer
 from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional
-from typing import List
+from typing import Optional, List
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from updateSheet import log_drawer_update
+import os
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
+# --- SendGrid Email Funktion ---
+def send_notification_email(drawer_id, status):
+    message = Mail(
+        from_email='monie@itu.dk',  
+        to_emails='monie@itu.dk',             
+        subject=f'Skuffe {drawer_id} status opdateret',
+        html_content=f'<strong>Status: {status}</strong>'
+    )
+    try:
+        sg = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
+        response = sg.send(message)
+        print(f"✅ Email sendt: Status {response.status_code}")
+    except Exception as e:
+        print(f"❌ Email fejl: {str(e)}")
 
-
-
+# --- FastAPI App ---
 app = FastAPI()
 Base.metadata.create_all(bind=engine)
-# Serve static files (like frontend)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 class LogMessage(BaseModel):
     log: str
 
+
+# --- Data Model ---
 class DrawerUpdate(BaseModel):
     drawer_id: str
     item_name: str
@@ -26,7 +42,7 @@ class DrawerUpdate(BaseModel):
     status: str
     last_updated: Optional[datetime] = None
 
-# Dependency to get DB session
+# --- DB Dependency ---
 def get_db():
     db = SessionLocal()
     try:
@@ -34,6 +50,7 @@ def get_db():
     finally:
         db.close()
 
+# --- Frontend ---
 @app.get("/")
 def serve_frontend():
     return FileResponse("static/index.html")    
@@ -58,6 +75,7 @@ async def receive_log(log_entry: LogMessage):
     return {"status": "Log message received successfully"}    
 
 
+# --- API Endpoint ---
 @app.post("/api/drawers/update", response_model=DrawerUpdate)
 def update_drawer(update: DrawerUpdate, db: Session = Depends(get_db)):
     print("Received update:", update)
@@ -81,6 +99,7 @@ def update_drawer(update: DrawerUpdate, db: Session = Depends(get_db)):
         db.add(drawer)
     db.commit()
 
+    # --- Sheets Log ---
     print("Calling log_drawer_update...")
     log_drawer_update(
         drawer_id=update.drawer_id,
@@ -88,6 +107,9 @@ def update_drawer(update: DrawerUpdate, db: Session = Depends(get_db)):
         sr_code=update.sr_code,
         status=update.status
     )
+
+    # --- Send Email ---
+    send_notification_email(update.drawer_id, update.status)
 
     print("Update complete")
     return DrawerUpdate(
@@ -98,9 +120,8 @@ def update_drawer(update: DrawerUpdate, db: Session = Depends(get_db)):
     last_updated=drawer.last_updated
 )
 
-
-
-@app.get ("/api/drawers", response_model=List[DrawerUpdate])
+# --- Get All Drawers ---
+@app.get("/api/drawers", response_model=List[DrawerUpdate])
 def get_all_drawers(db: Session = Depends(get_db)):
-        drawers = db.query(Drawer).all()
-        return drawers
+    drawers = db.query(Drawer).all()
+    return drawers
