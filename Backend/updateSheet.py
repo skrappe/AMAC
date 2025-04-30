@@ -25,7 +25,7 @@ def log_drawer_update(drawer_id, item_name, sr_code, status):
     for idx, record in enumerate(all_records, start=2):  # Header i række 1
         if str(record['Drawer ID']).strip() == drawer_id.strip():
             print(f"🔄 Opdaterer række {idx} for {drawer_id}")
-            # A: Drawer ID, B: Item, C: SR-code, D: Status, E: Timestamp
+            # A: Now, B: Drawer ID, C: Item, D: SR-code, E: Status
             sheet.update(f"A{idx}:E{idx}", [[now, drawer_id, item_name, sr_code, status]])
             row_found = True
             break
