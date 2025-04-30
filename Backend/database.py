@@ -1,8 +1,11 @@
 from sqlalchemy import create_engine, Column, String, Boolean, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import os
+
+time_zone = timezone(timedelta(hours=2))
+
 
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://amac_user:GhQAElY3mBVbSUaovKGUdat2ReC2J3Wf@dpg-d05mmnili9vc738vc69g-a.frankfurt-postgres.render.com/amac_db")
 if not DATABASE_URL:
@@ -22,4 +25,4 @@ class Drawer(Base):
     item_name = Column(String)
     sr_code = Column(String)
     status = Column(String)
-    last_updated = Column(DateTime, default=datetime.utcnow)
+    last_updated = Column(DateTime(timezone=True), default=lambda: datetime.now(time_zone))
