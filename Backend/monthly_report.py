@@ -32,7 +32,7 @@ def send_monthly_email(html_content):
     print("✅ SendGrid KEY found:", os.getenv("SENDGRID_API_KEY") is not None)
     message = Mail(
         from_email='skrappe9@hotmail.com',
-        to_emails='skrappe9@hotmail.com',
+        to_emails='skrappe9@gmail.com',
         subject='Monthly Drawer Status Report',
         html_content=html_content,
         plain_text_content="Se status for alle skuffer i den vedhæftede HTML-tabel."
