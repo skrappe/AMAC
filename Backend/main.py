@@ -14,8 +14,8 @@ from sendgrid.helpers.mail import Mail
 # --- SendGrid Email Funktion ---
 def send_notification_email(drawer_id, status):
     message = Mail(
-        from_email='monie@itu.dk',  
-        to_emails='monie@itu.dk',             
+        from_email='skrappe9@hotmail.com',
+        to_emails=['skrappe9@gmail.com','toft814@gmail.com'],            
         subject=f'Skuffe {drawer_id} status opdateret',
         html_content=f'<strong>Status: {status}</strong>'
     )
