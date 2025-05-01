@@ -22,11 +22,11 @@ def log_drawer_update(drawer_id, item_name, sr_code, status):
     now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
     drawer_id = drawer_id.strip().upper()
 
-    drawer_ids_column = sheet.col_values(2)  # Kolonne B = Drawer ID
+    all_rows = sheet.get_all_values()  # Rækker inkl. header og tomme celler
     row_found = False
 
-    for idx, cell_value in enumerate(drawer_ids_column, start=1):  # inkl. header
-        if cell_value.strip().upper() == drawer_id:
+    for idx, row in enumerate(all_rows[1:], start=2):  # Skip header, start ved række 2
+        if len(row) >= 2 and str(row[1]).strip().upper() == drawer_id:
             print(f"🔄 Opdaterer række {idx} for {drawer_id}")
             sheet.update(f"A{idx}:E{idx}", [[now, drawer_id, item_name, sr_code, status]])
             row_found = True
@@ -35,5 +35,6 @@ def log_drawer_update(drawer_id, item_name, sr_code, status):
     if not row_found:
         print(f"➕ Drawer ID ikke fundet, tilføjer ny række for {drawer_id}")
         sheet.append_row([now, drawer_id, item_name, sr_code, status])
+
 
 
