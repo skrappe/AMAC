@@ -109,7 +109,7 @@ def update_drawer(update: DrawerUpdate, db: Session = Depends(get_db)):
     )
 
     # --- Send Email ---
-    send_notification_email(update.drawer_id, update.status)
+    # send_notification_email(update.drawer_id, update.status)
 
     print("Update complete")
     return DrawerUpdate(
