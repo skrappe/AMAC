@@ -81,7 +81,6 @@ void sendStatus(String status)
 
     StaticJsonDocument<256> doc;
     doc["drawer_id"] = drawerId;
-    doc["sensor_type"] = "ultrasound";
     doc["item_name"] = itemName;
     doc["status"] = status;
     doc["sr_code"] = "xxxxxxxxx";

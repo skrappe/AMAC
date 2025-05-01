@@ -11,12 +11,16 @@ const char *serverUrl = "https://amac.onrender.com/api/drawers/update";
 
 // --- Sensor Pins ---
 const int NUM_SENSORS = 4;
-const int trigPins[NUM_SENSORS] = {2, 25, 17, 18};
-const int echoPins[NUM_SENSORS] = {15, 27, 16, 19};
+const int trigPins[NUM_SENSORS] = {21, 18, 25, 2};
+const int echoPins[NUM_SENSORS] = {22, 17, 27, 4};
 
 // --- Sensor Config ---
-const long baseCaseDurations[NUM_SENSORS] = {521, 551, 515, 545}; // Kalibrer disse!
-const long tolerances[NUM_SENSORS] = {5, 5, 5, 5};
+const long baseCaseDurations[NUM_SENSORS] = {568, 521, 621, 574}; // Kalibrer disse!
+const long tolerances[NUM_SENSORS] = {8, 8, 8, 8};
+
+const String drawerId[NUM_SENSORS] = {"001", "002", "003", "004"};
+const String itemName[NUM_SENSORS] = {"uMatch 14 POS FEM", "No tag 1", "No Tag 2", "MOSFET"};
+const String sr_code[NUM_SENSORS] = {"SR001", "SR002", "SR003", "SR004"};
 
 long emptyLowerBounds[NUM_SENSORS];
 long emptyUpperBounds[NUM_SENSORS];
@@ -30,7 +34,7 @@ void sendLog(String logMessage)
   if (WiFi.status() == WL_CONNECTED)
   {
     HTTPClient http;
-    http.begin("https://amac.onrender.com/");
+    http.begin("https://amac.onrender.com/api/log");
     http.addHeader("Content-Type", "application/json");
 
     StaticJsonDocument<256> doc;
@@ -83,17 +87,16 @@ void sendStatus(int sensorIndex, String status)
     http.addHeader("Content-Type", "application/json");
 
     StaticJsonDocument<256> doc;
-    String drawerId = "drawer_ultra_s" + String(sensorIndex + 1);
-    doc["drawer_id"] = drawerId;
-    doc["sensor_type"] = "ultrasound";
+    doc["drawer_id"] = drawerId[sensorIndex];
+    doc["item_name"] = itemName[sensorIndex];
+    doc["sr_code"] = sr_code[sensorIndex];
     doc["status"] = status;
-    doc["conductive"] = false;
 
     String json;
     serializeJson(doc, json);
 
     int httpCode = http.POST(json);
-    String msg = "🌐 Sensor " + String(sensorIndex + 1) + " HTTP POST: " + String(httpCode);
+    String msg = "Sensor " + drawerId[sensorIndex] + " HTTP POST: " + String(httpCode);
     Serial.println(msg);
     sendLog(msg);
 
@@ -146,7 +149,7 @@ void loop()
     int validSamples = 0;
 
     for (int s = 0; s < 50; s++)
-    { // 50 samples pr sensor
+    {
       digitalWrite(trigPins[i], LOW);
       delayMicroseconds(2);
       digitalWrite(trigPins[i], HIGH);
@@ -165,26 +168,65 @@ void loop()
     if (validSamples > 0)
     {
       long avgDuration = totalDuration / validSamples;
-      String status = (avgDuration >= emptyLowerBounds[i] && avgDuration <= emptyUpperBounds[i])
-                          ? "empty"
-                          : "item_detected";
+      String currentStatus = (avgDuration >= emptyLowerBounds[i] && avgDuration <= emptyUpperBounds[i])
+                                 ? "empty"
+                                 : "item_detected";
 
-      String statusMsg = "Sensor " + String(i + 1) + ": " + String(avgDuration) + " us → " + status;
+      String statusMsg = "Sensor " + String(i + 1) + ": " + String(avgDuration) + " us → " + currentStatus;
       Serial.println(statusMsg);
       sendLog(statusMsg);
 
-      String logMessage = "Measurement: " + String(avgDuration) + " us, Status: " + status;
-      sendLog(logMessage);
-
-      if (status != lastStatus[i] && millis() - lastSent[i] > sendInterval)
+      if (currentStatus != lastStatus[i] && millis() - lastSent[i] > sendInterval)
       {
-        reconnectWiFi();
-        sendStatus(i, status);
-        lastStatus[i] = status;
-        lastSent[i] = millis();
+        bool confirmed = true;
+        for (int confirmCount = 0; confirmCount < 5; confirmCount++)
+        {
+          delay(200); // Wait between confirmations
+          long confirmTotal = 0;
+          int confirmValid = 0;
+
+          for (int s = 0; s < 20; s++)
+          {
+            digitalWrite(trigPins[i], LOW);
+            delayMicroseconds(2);
+            digitalWrite(trigPins[i], HIGH);
+            delayMicroseconds(10);
+            digitalWrite(trigPins[i], LOW);
+
+            long d = pulseIn(echoPins[i], HIGH, 10000);
+            if (d > 0)
+            {
+              confirmTotal += d;
+              confirmValid++;
+            }
+            delay(5);
+          }
+
+          if (confirmValid == 0)
+            continue;
+
+          long confirmAvg = confirmTotal / confirmValid;
+          String confirmStatus = (confirmAvg >= emptyLowerBounds[i] && confirmAvg <= emptyUpperBounds[i])
+                                     ? "empty"
+                                     : "item_detected";
+
+          if (confirmStatus != currentStatus)
+          {
+            confirmed = false;
+            break;
+          }
+        }
+
+        if (confirmed)
+        {
+          reconnectWiFi();
+          sendStatus(i, currentStatus);
+          lastStatus[i] = currentStatus;
+          lastSent[i] = millis();
+        }
       }
     }
   }
 
-  delay(500); // Delay mellem sensorrunder
+  delay(500); // Delay between sensor rounds
 }
