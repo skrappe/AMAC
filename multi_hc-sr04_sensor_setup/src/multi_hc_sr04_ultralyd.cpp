@@ -141,92 +141,84 @@ void setup()
   sendLog(setupMsg);
 }
 
-void loop()
-{
-  for (int i = 0; i < NUM_SENSORS; i++)
-  {
+void loop() {
+  for (int i = 0; i < NUM_SENSORS; i++) {
+    // ——— 1) Tag 50 prøver og beregn gennemsnit ———
     long totalDuration = 0;
     int validSamples = 0;
-
-    for (int s = 0; s < 50; s++)
-    {
+    for (int s = 0; s < 50; s++) {
       digitalWrite(trigPins[i], LOW);
       delayMicroseconds(2);
       digitalWrite(trigPins[i], HIGH);
       delayMicroseconds(10);
       digitalWrite(trigPins[i], LOW);
-
       long duration = pulseIn(echoPins[i], HIGH, 10000);
-      if (duration > 0)
-      {
+      if (duration > 0) {
         totalDuration += duration;
         validSamples++;
       }
       delay(10);
     }
+    if (validSamples == 0) continue;  // intet ekko → spring over
 
-    if (validSamples > 0)
-    {
-      long avgDuration = totalDuration / validSamples;
-      String currentStatus = (avgDuration >= emptyLowerBounds[i] && avgDuration <= emptyUpperBounds[i])
-                                 ? "empty"
-                                 : "item_detected";
+    // ——— 2) Beregn status og debug-print med index i ———
+    long avgDuration = totalDuration / validSamples;
+    String currentStatus = (avgDuration >= emptyLowerBounds[i] && avgDuration <= emptyUpperBounds[i])
+                               ? "empty"
+                               : "item_detected";
+    String debugMsg = "DEBUG → i=" + String(i)
+                      + " drawer=" + drawerId[i]
+                      + " avg=" + String(avgDuration)
+                      + " us → " + currentStatus;
+    Serial.println(debugMsg);
+    sendLog(debugMsg);
 
-      String statusMsg = "Sensor " + String(i + 1) + ": " + String(avgDuration) + " us → " + currentStatus;
-      Serial.println(statusMsg);
-      sendLog(statusMsg);
-
-      if (currentStatus != lastStatus[i] && millis() - lastSent[i] > sendInterval)
-      {
-        bool confirmed = true;
-        for (int confirmCount = 0; confirmCount < 5; confirmCount++)
-        {
-          delay(200); // Wait between confirmations
-          long confirmTotal = 0;
-          int confirmValid = 0;
-
-          for (int s = 0; s < 20; s++)
-          {
-            digitalWrite(trigPins[i], LOW);
-            delayMicroseconds(2);
-            digitalWrite(trigPins[i], HIGH);
-            delayMicroseconds(10);
-            digitalWrite(trigPins[i], LOW);
-
-            long d = pulseIn(echoPins[i], HIGH, 10000);
-            if (d > 0)
-            {
-              confirmTotal += d;
-              confirmValid++;
-            }
-            delay(5);
+    // ——— 3) Kun hvis status er ændret og der er gået > sendInterval ———
+    if (currentStatus != lastStatus[i] && millis() - lastSent[i] > sendInterval) {
+      // 3a) Bekræft med 5 ekstra runder
+      bool confirmed = true;
+      for (int confirmCount = 0; confirmCount < 5; confirmCount++) {
+        delay(200);
+        long confirmTotal = 0;
+        int confirmValid = 0;
+        for (int s = 0; s < 20; s++) {
+          digitalWrite(trigPins[i], LOW);
+          delayMicroseconds(2);
+          digitalWrite(trigPins[i], HIGH);
+          delayMicroseconds(10);
+          digitalWrite(trigPins[i], LOW);
+          long d = pulseIn(echoPins[i], HIGH, 10000);
+          if (d > 0) {
+            confirmTotal += d;
+            confirmValid++;
           }
-
-          if (confirmValid == 0)
-            continue;
-
-          long confirmAvg = confirmTotal / confirmValid;
-          String confirmStatus = (confirmAvg >= emptyLowerBounds[i] && confirmAvg <= emptyUpperBounds[i])
-                                     ? "empty"
-                                     : "item_detected";
-
-          if (confirmStatus != currentStatus)
-          {
-            confirmed = false;
-            break;
-          }
+          delay(5);
         }
-
-        if (confirmed)
-        {
-          reconnectWiFi();
-          sendStatus(i, currentStatus);
-          lastStatus[i] = currentStatus;
-          lastSent[i] = millis();
+        if (confirmValid == 0) continue;
+        long confirmAvg = confirmTotal / confirmValid;
+        String confirmStatus = (confirmAvg >= emptyLowerBounds[i] && confirmAvg <= emptyUpperBounds[i])
+                                   ? "empty"
+                                   : "item_detected";
+        if (confirmStatus != currentStatus) {
+          confirmed = false;
+          break;
         }
       }
+
+      // 3b) Hvis bekræftet, så gen‐forbind WiFi OG send status på netværket
+      if (confirmed) {
+        reconnectWiFi();
+        sendStatus(i, currentStatus);      // ← Her sender vi altid med præcis det indeks “i”
+        lastStatus[i] = currentStatus;
+        lastSent[i]   = millis();
+      }
     }
+
+    // 4) Kort pause før næste sensor
+    delay(50);
   }
 
-  delay(500); // Delay between sensor rounds
+  // 5) Pause når alle fire er behandlet
+  delay(500);
 }
+
