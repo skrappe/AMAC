@@ -174,47 +174,14 @@ void loop() {
     sendLog(debugMsg);
 
     // ——— 3) Kun hvis status er ændret og der er gået > sendInterval ———
-    if (currentStatus != lastStatus[i] && millis() - lastSent[i] > sendInterval) {
-      // 3a) Bekræft med 5 ekstra runder
-      bool confirmed = true;
-      for (int confirmCount = 0; confirmCount < 5; confirmCount++) {
-        delay(200);
-        long confirmTotal = 0;
-        int confirmValid = 0;
-        for (int s = 0; s < 20; s++) {
-          digitalWrite(trigPins[i], LOW);
-          delayMicroseconds(2);
-          digitalWrite(trigPins[i], HIGH);
-          delayMicroseconds(10);
-          digitalWrite(trigPins[i], LOW);
-          long d = pulseIn(echoPins[i], HIGH, 10000);
-          if (d > 0) {
-            confirmTotal += d;
-            confirmValid++;
-          }
-          delay(5);
-        }
-        if (confirmValid == 0) continue;
-        long confirmAvg = confirmTotal / confirmValid;
-        String confirmStatus = (confirmAvg >= emptyLowerBounds[i] && confirmAvg <= emptyUpperBounds[i])
-                                   ? "empty"
-                                   : "item_detected";
-        if (confirmStatus != currentStatus) {
-          confirmed = false;
-          break;
-        }
-      }
-
-      // 3b) Hvis bekræftet, så gen‐forbind WiFi OG send status på netværket
-      if (confirmed) {
-        reconnectWiFi();
-        sendStatus(i, currentStatus);      // ← Her sender vi altid med præcis det indeks “i”
-        lastStatus[i] = currentStatus;
-        lastSent[i]   = millis();
-      }
+    if (currentStatus != lastStatus[i]) {
+      reconnectWiFi();
+      sendStatus(i, currentStatus);   // sender status for skuffe i
+      lastStatus[i] = currentStatus;  // opdaterer kendt status
+      lastSent[i]   = millis();       // (valgfrit) kan bruges til rate-limiting
     }
-
-    // 4) Kort pause før næste sensor
+    
+    // Kort pause før næste sensor
     delay(50);
   }
 
