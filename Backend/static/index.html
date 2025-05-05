@@ -37,14 +37,25 @@
 
       data.forEach(drawer => {
         const row = document.createElement("tr");
-        row.className = drawer.status === "empty" ? "empty" : "occupied";
-        row.innerHTML = `
-          <td>${new Date(drawer.last_updated).toLocaleString()}</td>
-          <td>${drawer.drawer_id}</td>
-          <td>${drawer.item_name}</td>
-          <td>${drawer.sr_code}</td>
-          <td>${drawer.status ? "Item detected" : "Empty or very few"}</td>
-        `;
+        // Lav en pæn tekst ud af status‐feltet
+const statusText = drawer.status === "empty"
+  ? "Empty"
+  : drawer.status === "item_detected"
+    ? "Item detected"
+    : drawer.status; 
+
+// Sæt CSS‐klasse så den matcher dine styles (.empty og .item_detected)
+row.className = drawer.status;
+
+// Byg række‐HTML med den nye statusText
+row.innerHTML = `
+  <td>${new Date(drawer.last_updated).toLocaleString()}</td>
+  <td>${drawer.drawer_id}</td>
+  <td>${drawer.item_name}</td>
+  <td>${drawer.sr_code}</td>
+  <td>${statusText}</td>
+`;
+
         tbody.appendChild(row);
       });
     }
