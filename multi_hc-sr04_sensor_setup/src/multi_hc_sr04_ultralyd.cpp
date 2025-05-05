@@ -15,11 +15,11 @@ const int trigPins[NUM_SENSORS] = {21, 18, 25, 2};
 const int echoPins[NUM_SENSORS] = {22, 17, 27, 4};
 
 // --- Sensor Config ---
-const long baseCaseDurations[NUM_SENSORS] = {568, 521, 621, 574}; // Kalibrer disse!
+const long baseCaseDurations[NUM_SENSORS] = {568, 521, 538, 574}; // Kalibrer disse!
 const long tolerances[NUM_SENSORS] = {8, 8, 8, 8};
 
 const String drawerId[NUM_SENSORS] = {"001", "002", "003", "004"};
-const String itemName[NUM_SENSORS] = {"uMatch 14 POS FEM", "No tag 1", "No Tag 2", "MOSFET"};
+const String itemName[NUM_SENSORS] = {"uMatch 14 POS FEM", "No tag 1", "Reg 3.3V", "MOSFET"};
 const String sr_code[NUM_SENSORS] = {"SR001", "SR002", "SR003", "SR004"};
 
 long emptyLowerBounds[NUM_SENSORS];
@@ -141,92 +141,51 @@ void setup()
   sendLog(setupMsg);
 }
 
-void loop()
-{
-  for (int i = 0; i < NUM_SENSORS; i++)
-  {
+void loop() {
+  for (int i = 0; i < NUM_SENSORS; i++) {
+    // ——— 1) Tag 50 prøver og beregn gennemsnit ———
     long totalDuration = 0;
     int validSamples = 0;
-
-    for (int s = 0; s < 50; s++)
-    {
+    for (int s = 0; s < 50; s++) {
       digitalWrite(trigPins[i], LOW);
       delayMicroseconds(2);
       digitalWrite(trigPins[i], HIGH);
       delayMicroseconds(10);
       digitalWrite(trigPins[i], LOW);
-
       long duration = pulseIn(echoPins[i], HIGH, 10000);
-      if (duration > 0)
-      {
+      if (duration > 0) {
         totalDuration += duration;
         validSamples++;
       }
       delay(10);
     }
+    if (validSamples == 0) continue;  // intet ekko → spring over
 
-    if (validSamples > 0)
-    {
-      long avgDuration = totalDuration / validSamples;
-      String currentStatus = (avgDuration >= emptyLowerBounds[i] && avgDuration <= emptyUpperBounds[i])
-                                 ? "empty"
-                                 : "item_detected";
+    // ——— 2) Beregn status og debug-print med index i ———
+    long avgDuration = totalDuration / validSamples;
+    String currentStatus = (avgDuration >= emptyLowerBounds[i] && avgDuration <= emptyUpperBounds[i])
+                               ? "empty"
+                               : "item_detected";
+    String debugMsg = "DEBUG → i=" + String(i)
+                      + " drawer=" + drawerId[i]
+                      + " avg=" + String(avgDuration)
+                      + " us → " + currentStatus;
+    Serial.println(debugMsg);
+    sendLog(debugMsg);
 
-      String statusMsg = "Sensor " + String(i + 1) + ": " + String(avgDuration) + " us → " + currentStatus;
-      Serial.println(statusMsg);
-      sendLog(statusMsg);
-
-      if (currentStatus != lastStatus[i] && millis() - lastSent[i] > sendInterval)
-      {
-        bool confirmed = true;
-        for (int confirmCount = 0; confirmCount < 5; confirmCount++)
-        {
-          delay(200); // Wait between confirmations
-          long confirmTotal = 0;
-          int confirmValid = 0;
-
-          for (int s = 0; s < 20; s++)
-          {
-            digitalWrite(trigPins[i], LOW);
-            delayMicroseconds(2);
-            digitalWrite(trigPins[i], HIGH);
-            delayMicroseconds(10);
-            digitalWrite(trigPins[i], LOW);
-
-            long d = pulseIn(echoPins[i], HIGH, 10000);
-            if (d > 0)
-            {
-              confirmTotal += d;
-              confirmValid++;
-            }
-            delay(5);
-          }
-
-          if (confirmValid == 0)
-            continue;
-
-          long confirmAvg = confirmTotal / confirmValid;
-          String confirmStatus = (confirmAvg >= emptyLowerBounds[i] && confirmAvg <= emptyUpperBounds[i])
-                                     ? "empty"
-                                     : "item_detected";
-
-          if (confirmStatus != currentStatus)
-          {
-            confirmed = false;
-            break;
-          }
-        }
-
-        if (confirmed)
-        {
-          reconnectWiFi();
-          sendStatus(i, currentStatus);
-          lastStatus[i] = currentStatus;
-          lastSent[i] = millis();
-        }
-      }
+    // ——— 3) Kun hvis status er ændret og der er gået > sendInterval ———
+    if (currentStatus != lastStatus[i]) {
+      reconnectWiFi();
+      sendStatus(i, currentStatus);   // sender status for skuffe i
+      lastStatus[i] = currentStatus;  // opdaterer kendt status
+      lastSent[i]   = millis();       // (valgfrit) kan bruges til rate-limiting
     }
+    
+    // Kort pause før næste sensor
+    delay(50);
   }
 
-  delay(500); // Delay between sensor rounds
+  // 5) Pause når alle fire er behandlet
+  delay(500);
 }
+

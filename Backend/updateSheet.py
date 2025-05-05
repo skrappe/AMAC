@@ -19,7 +19,7 @@ sheet = gc.open_by_key(SPREADSHEET_ID).worksheet(SHEET_NAME)
 
 # --- Logging function ---
 def log_drawer_update(drawer_id, item_name, sr_code, status):
-    now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    now = datetime.now(time_zone).strftime("%Y-%m-%d %H:%M:%S")
     drawer_id = drawer_id.strip().upper()
 
     all_rows = sheet.get_all_values()  # Rækker inkl. header og tomme celler
