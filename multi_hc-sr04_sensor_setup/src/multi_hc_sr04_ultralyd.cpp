@@ -80,7 +80,7 @@ void reconnectWiFi()
 // --- Send status for each sensor ---
 void sendStatus(int sensorIndex, String status)
 {
-  if (WiFi.status() == WL_CONNECTED)
+  x if (WiFi.status() == WL_CONNECTED)
   {
     HTTPClient http;
     http.begin(serverUrl);

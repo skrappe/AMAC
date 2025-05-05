@@ -16,8 +16,8 @@ const int echoPin = 27;
 
 const long baseCaseDuration = 538; // baseline measurement when empty
 const long tolerance = 5;          // acceptable variation
-const String drawerId = "002";     // unique ID for this drawer
-const String itemName = "MOSFET";
+const String drawerId = "005";     // unique ID for this drawer
+const String itemName = "REG 3.3V";
 
 const unsigned long sendInterval = 1000; // time between status updates
 // ----------------------------------------------------------- //
