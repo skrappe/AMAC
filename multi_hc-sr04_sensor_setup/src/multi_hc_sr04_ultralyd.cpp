@@ -15,8 +15,8 @@ const int trigPins[NUM_SENSORS] = {21, 18, 25, 2};
 const int echoPins[NUM_SENSORS] = {22, 17, 27, 4};
 
 // --- Sensor Config ---
-const long baseCaseDurations[NUM_SENSORS] = {568, 521, 555, 574}; // Kalibrer disse!
-const long tolerances[NUM_SENSORS] = {8, 8, 10, 8};
+const long baseCaseDurations[NUM_SENSORS] = {568, 521, 538, 574}; // Kalibrer disse!
+const long tolerances[NUM_SENSORS] = {8, 8, 8, 8};
 
 const String drawerId[NUM_SENSORS] = {"001", "002", "003", "004"};
 const String itemName[NUM_SENSORS] = {"uMatch 14 POS FEM", "No tag 1", "Reg 3.3V", "MOSFET"};
