@@ -23,3 +23,10 @@ for i in range(1, 11):
     response = requests.post(API_URL, json=payload)
     print(f"[{drawer_id}] Status: {response.status_code} - {response.json()}")
     time.sleep(0.2)  # short delay to simulate network interval
+
+
+
+# This file simulates drawer updates for testing purposes in the ESP32 Drawer Monitoring System.
+# We have used AI, specifically OpenAI's ChatGPT, to assist with refining the structure of the code
+# and ensuring consistency in comments and documentation.
+# All code complies with ITU's instructions regarding Generative AI.

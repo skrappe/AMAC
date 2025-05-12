@@ -189,3 +189,9 @@ void loop() {
   delay(500);
 }
 
+
+
+// This file contains the firmware for handling multiple HC-SR04 sensors in the ESP32 Drawer Monitoring System.
+// We have used AI, specifically OpenAI's ChatGPT, to assist with improving the structure of the code
+// and ensuring clarity in comments and documentation.
+// All code complies with ITU's instructions regarding Generative AI.

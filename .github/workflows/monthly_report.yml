@@ -31,3 +31,8 @@ jobs:
           SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
         run: |
           python Backend/monthly_report.py
+
+# This GitHub Actions workflow automates the monthly email reporting for the ESP32 Drawer Monitoring System.
+# We have used AI, specifically OpenAI's ChatGPT, to assist with refining the structure of the workflow
+# and ensuring clarity in comments and documentation.
+# All code complies with ITU's instructions regarding Generative AI.

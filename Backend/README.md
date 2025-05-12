@@ -1,19 +1,18 @@
 # ESP32 Drawer Monitoring System
-
-This project provides a backend and dashboard system for monitoring the occupancy status of component drawers using Wi-Fi-enabled ESP32 microcontrollers. It was developed as part of a bachelor thesis at the IT University of Copenhagen.
+This project provides a backend and dashboard system for monitoring the occupancy status of component drawers using WiFi-enabled ESP32 microcontrollers. It was developed as part of a bachelor thesis at the IT University of Copenhagen.
 
 ## Project Overview
 
-The system receives occupancy data from ultrasonic sensors mounted on drawers. The data is processed and stored in a cloud-hosted PostgreSQL database. A web-based dashboard provides real-time visibility, and monthly summary reports are sent automatically via email. Status changes are also logged to an external Google Sheet to support existing workflows.
+The system receives occupancy data from ultrasound sensors mounted on drawers. The data is processed and stored in a cloud hosted PostgreSQL database. A web based dashboard provides real time visibility, and monthly summary reports are sent automatically via email. Status changes are also logged to an external Google Sheet to support existing workflows, aswell as a psysical notification via LED lights, that indicate weather the drawers are empty or not.
 
-The goal was to build a simple, scalable, and low-maintenance system suitable for lab environments such as ITU's REAL Lab.
+The goal was to build a simple, scalable, and low maintenance system suitable for lab environments such as ITU's REAL Lab.
 
 ## Features
 
 - FastAPI backend to receive and store data from ESP32 devices
 - PostgreSQL database hosted on Render for persistent storage
 - Static HTML and JavaScript frontend dashboard
-- ESP32 integration with ultrasonic sensors and LED indicators
+- ESP32 integration with ultrasound sensors and LED indicators
 - Automated monthly status report emails (using SendGrid + GitHub Actions)
 - Google Sheets integration for external log visibility
 
@@ -65,7 +64,7 @@ git clone <repo url>
 cd <cd repo folder>
 
 
-### 2. Create a Virtual Environment (optional but recommended)
+### 2. Create a Virtual Environment (optional but recommended. For global installation: pip install -r requirements.txt)
 
 # on Mac: 
 python -m venv venv
@@ -73,21 +72,18 @@ source venv/bin/activate
 # On Windows: 
 venv\Scripts\activate
 
-
 ### 3. Install Dependencies
-
 pip install -r requirements.txt
 
 
 ### 4. Set Environment Variables
-
 The following variables are required:
 
 SENDGRID_API_KEY=<api-key>
 DATABASE_URL=<postgresql-database-url>
 
 
-You can export them manually or place them in a `.env` file and load using `python-dotenv`.
+We do not use a .env file locally to store any secret keys etc. Instead all enviorment variables are securely managed via Render, Github secrets and Google cloud IAM. 
 
 ### 5. Run the Backend Server
 
@@ -167,3 +163,7 @@ Each ESP32 microcontroller:
 
 This project was developed for academic purposes. License and reuse terms can be added here as needed.
 
+<!-- This README file was developed to document the ESP32 Drawer Monitoring System. -->
+<!-- We have used AI, specifically OpenAI's ChatGPT, to assist with refining the structure, -->
+<!-- improving readability, and ensuring consistency in the documentation. -->
+<!-- All content complies with ITU's instructions regarding Generative AI. -->
