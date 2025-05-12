@@ -1,46 +1,169 @@
 # ESP32 Drawer Monitoring System
 
-This project provides a backend and dashboard for monitoring electronic component drawers using ESP32 Wi-Fi-enabled sensors.
+This project provides a backend and dashboard system for monitoring the occupancy status of component drawers using Wi-Fi-enabled ESP32 microcontrollers. It was developed as part of a bachelor thesis at the IT University of Copenhagen.
 
-## 📦 Features
+## Project Overview
 
-- FastAPI backend to receive drawer updates
-- SQLite database for storing current drawer status
-- HTML/JS frontend dashboard served from the same server
-- Simulation script to generate fake ESP32 drawer data
+The system receives occupancy data from ultrasonic sensors mounted on drawers. The data is processed and stored in a cloud-hosted PostgreSQL database. A web-based dashboard provides real-time visibility, and monthly summary reports are sent automatically via email. Status changes are also logged to an external Google Sheet to support existing workflows.
 
----
+The goal was to build a simple, scalable, and low-maintenance system suitable for lab environments such as ITU's REAL Lab.
 
-## 🚀 Getting Started
+## Features
+
+- FastAPI backend to receive and store data from ESP32 devices
+- PostgreSQL database hosted on Render for persistent storage
+- Static HTML and JavaScript frontend dashboard
+- ESP32 integration with ultrasonic sensors and LED indicators
+- Automated monthly status report emails (using SendGrid + GitHub Actions)
+- Google Sheets integration for external log visibility
+
+## Repository Structure
+
+AMAC/
+├── .github/
+│   └── workflows/
+│       └── monthly_report.yml       
+├── Backend/
+│   ├── __pycache__/                 
+│   ├── .venv/                       
+│   ├── credentials/                 
+│   ├── static/
+│   │   └── index.html               
+│   ├── cleanup_db.py                
+│   ├── create_db.py                 
+│   ├── database.py                  
+│   ├── main.py                      
+│   ├── monthly_report.py            
+│   ├── Overview.md                  
+│   ├── README.md                    
+│   ├── requirements.txt             
+│   ├── simulate_updates.py          
+│   └── updateSheet.py               
+├── LED_breadboard_setup/
+│   ├── platformio.ini               
+│   ├── src/
+│   │   └── main.cpp                 
+│   └── test/                        
+├── multi_hc-sr04_sensor_setup/
+│   ├── platformio.ini               
+│   ├── src/
+│   │   └── multi_hc_sr04_ultralyd.cpp 
+│   └── test/                        
+├── single_hc-sr04_sensor_setup/
+│   ├── platformio.ini               
+│   ├── src/
+│   │   └── main.cpp                 
+│   └── test/                        
+└── requirements.txt                 
+
+
+## Installation and Setup
 
 ### 1. Clone the Repository
 
+git clone <repo url>
+cd <cd repo folder>
 
-git clone <your-repo-url>
-cd <your-repo-folder>
 
-### 2. Create a Virtual Environment (Optional but Recommended)
+### 2. Create a Virtual Environment (optional but recommended)
+
+# on Mac: 
 python -m venv venv
-source venv/bin/activate         # On Windows: venv\Scripts\activate
+source venv/bin/activate 
+# On Windows: 
+venv\Scripts\activate
+
 
 ### 3. Install Dependencies
+
 pip install -r requirements.txt
 
-### 4. Run the Backend Server
-uvicorn main:app --reload
 
-Visit the dashboard in your browser:
-👉 http://127.0.0.1:8000/
+### 4. Set Environment Variables
 
-API docs (Swagger):
-👉 http://127.0.0.1:8000/docs
+The following variables are required:
 
-### 5. Simulate Sensor Data (Optional)
-This script mimics ESP32 sensors sending updates:
+SENDGRID_API_KEY=<api-key>
+DATABASE_URL=<postgresql-database-url>
 
-python simulate_updates.py
-It will send multiple POST requests to /api/drawers/update with randomized data.
 
-### PlatformIO 
-pio run --target upload 
-pio device monitor
+You can export them manually or place them in a `.env` file and load using `python-dotenv`.
+
+### 5. Run the Backend Server
+
+uvicorn Backend.main:app --reload
+
+The dashboard and API will now be available:
+- Dashboard: `http://127.0.0.1:8000/`
+- Swagger Docs: `http://127.0.0.1:8000/docs`
+
+## Monthly Email Reporting
+
+The system sends a monthly email summary on the first day of each month at 12:00 PM UTC. This is handled using a GitHub Actions workflow that runs the `monthly_report.py` script and sends the email via SendGrid.
+
+To run the script manually:
+python Backend/monthly_report.py
+
+
+## Google Sheets Integration
+
+Drawer updates are mirrored to a shared Google Sheet using the Google Sheets API.
+Access and sharing are controlled using a Google service account with read and write permissions.
+
+## Dashboard
+
+The dashboard is a static HTML page served directly from the backend. It:
+
+- Displays all drawer statuses in a table format
+- Automatically refreshes every 5 seconds
+- Uses red/green color indicators for empty or occupied drawers
+
+The dashboard is located in `Backend/static/index.html` and requires no additional setup.
+
+## ESP32 Integration
+
+Each ESP32 microcontroller:
+
+- Connects to Wi-Fi and sends POST requests to the backend
+- Reads distance data using an HC-SR04 ultrasonic sensor
+- Controls red/green LEDs to provide local status feedback
+- Operates independently, requiring no central coordination
+- ESP32 firmware is developed using PlotformIO 
+
+#### Steps to Upload Firmware:
+1. Install PlatformIO:
+   pip install platformio
+   cd multi_hc-sr04_sensor_setup
+   pio run --target upload
+   pio device monitor
+
+## Technology Stack
+
+- Python 3.11+
+- FastAPI
+- SQLAlchemy
+- PostgreSQL
+- Uvicorn
+- SendGrid
+- Google Sheets API
+- HTML/CSS/JavaScript
+- GitHub Actions
+
+## Functional Highlights
+
+- Real time drawer status via HTTP API
+- Low latency polling dashboard with no frontend framework
+- Scalable backend
+- Scheduled email reports without maintaining an internal scheduler
+- External logging without granting access to database or server
+
+## Usage Notes
+
+- The system is designed for indoor environments like university labs
+- Network connectivity is assumed for both ESP32 devices and the backend
+- For production use, security features such as authentication and HTTPS should be added
+
+## License
+
+This project was developed for academic purposes. License and reuse terms can be added here as needed.
+
