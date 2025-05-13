@@ -1,3 +1,8 @@
+# This file handles integration with the Google Sheets API for the ESP32 Drawer Monitoring System.
+# We have used AI, specifically OpenAI's ChatGPT, to assist with improving the structure of the code
+# and ensuring clarity in comments and documentation.
+# All code complies with ITU's instructions regarding Generative AI.
+
 # Backend/updateSheet.py
 import os
 import gspread
@@ -36,10 +41,3 @@ def log_drawer_update(drawer_id, item_name, sr_code, status):
         print(f"➕ Drawer ID ikke fundet, tilføjer ny række for {drawer_id}")
         sheet.append_row([now, drawer_id, item_name, sr_code, status])
 
-
-
-
-# This file handles integration with the Google Sheets API for the ESP32 Drawer Monitoring System.
-# We have used AI, specifically OpenAI's ChatGPT, to assist with improving the structure of the code
-# and ensuring clarity in comments and documentation.
-# All code complies with ITU's instructions regarding Generative AI.

@@ -32,7 +32,7 @@
       const response = await fetch('https://amac.onrender.com/api/drawers', { cache: 'no-store' });
       const data = await response.json();
     
-      // ← Her sorterer vi på drawer_id:
+      // Her sorterer vi på drawer_id:
       data.sort((a, b) =>
         a.drawer_id.localeCompare(b.drawer_id, undefined, { numeric: true })
       );

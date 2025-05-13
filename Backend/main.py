@@ -1,3 +1,8 @@
+# This file was developed as part of the ESP32 Drawer Monitoring System.
+# We have used AI, specifically OpenAI's ChatGPT, to assist with refining the structure of the code,
+# improving readability, and ensuring consistency in comments and documentation.
+# All code complies with ITU's instructions regarding Generative AI.
+
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from database import Base, engine, SessionLocal, Drawer
@@ -125,10 +130,3 @@ def update_drawer(update: DrawerUpdate, db: Session = Depends(get_db)):
 def get_all_drawers(db: Session = Depends(get_db)):
     drawers = db.query(Drawer).all()
     return drawers
-
-
-
-# This file was developed as part of the ESP32 Drawer Monitoring System.
-# We have used AI, specifically OpenAI's ChatGPT, to assist with refining the structure of the code,
-# improving readability, and ensuring consistency in comments and documentation.
-# All code complies with ITU's instructions regarding Generative AI.

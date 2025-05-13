@@ -1,3 +1,8 @@
+# This file contains the database models and connection logic for the ESP32 Drawer Monitoring System.
+# We have used AI, specifically OpenAI's ChatGPT, to assist with improving the structure of the code,
+# ensuring clarity in comments, and validating the overall design.
+# All code complies with ITU's instructions regarding Generative AI.
+
 from sqlalchemy import create_engine, Column, String, Boolean, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -26,9 +31,3 @@ class Drawer(Base):
     sr_code = Column(String)
     status = Column(String)
     last_updated = Column(DateTime(timezone=True), default=lambda: datetime.now(time_zone))
-
-
-# This file contains the database models and connection logic for the ESP32 Drawer Monitoring System.
-# We have used AI, specifically OpenAI's ChatGPT, to assist with improving the structure of the code,
-# ensuring clarity in comments, and validating the overall design.
-# All code complies with ITU's instructions regarding Generative AI.

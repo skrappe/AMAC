@@ -1,3 +1,8 @@
+# This file generates and sends monthly email reports for the ESP32 Drawer Monitoring System.
+# We have used AI, specifically OpenAI's ChatGPT, to refine the structure of the code,
+# improve documentation, and ensure consistency in the logic.
+# All code complies with ITU's instructions regarding Generative AI.
+
 # monthly_report.py
 import os
 from sqlalchemy import create_engine
@@ -95,10 +100,3 @@ if __name__ == "__main__":
     drawers = get_drawer_statuses()
     html = generate_html(drawers)
     send_monthly_email(html)
-
-
-
-# This file generates and sends monthly email reports for the ESP32 Drawer Monitoring System.
-# We have used AI, specifically OpenAI's ChatGPT, to refine the structure of the code,
-# improve documentation, and ensure consistency in the logic.
-# All code complies with ITU's instructions regarding Generative AI.

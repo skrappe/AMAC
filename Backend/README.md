@@ -1,9 +1,14 @@
+<!-- This README file was developed to document the ESP32 Drawer Monitoring System. -->
+<!-- We have used AI, specifically OpenAI's ChatGPT, to assist with refining the structure, -->
+<!-- improving readability, including comments, and ensuring consistency in the documentation. -->
+<!-- All content complies with ITU's instructions regarding Generative AI. -->
+
 # ESP32 Drawer Monitoring System
 This project provides a backend and dashboard system for monitoring the occupancy status of component drawers using WiFi-enabled ESP32 microcontrollers. It was developed as part of a bachelor thesis at the IT University of Copenhagen.
 
 ## Project Overview
 
-The system receives occupancy data from ultrasound sensors mounted on drawers. The data is processed and stored in a cloud hosted PostgreSQL database. A web based dashboard provides real time visibility, and monthly summary reports are sent automatically via email. Status changes are also logged to an external Google Sheet to support existing workflows, aswell as a psysical notification via LED lights, that indicate weather the drawers are empty or not.
+The system receives occupancy data from ultrasonic sensors mounted on drawers. The data is processed and stored in a cloud hosted PostgreSQL database. A web based dashboard provides real time visibility, and monthly summary reports are sent automatically via email. Status changes are also logged to an external Google Sheet to support existing workflows, aswell as a psysical notification via LED lights, that indicate weather the drawers are empty or not.
 
 The goal was to build a simple, scalable, and low maintenance system suitable for lab environments such as ITU's REAL Lab.
 
@@ -12,7 +17,7 @@ The goal was to build a simple, scalable, and low maintenance system suitable fo
 - FastAPI backend to receive and store data from ESP32 devices
 - PostgreSQL database hosted on Render for persistent storage
 - Static HTML and JavaScript frontend dashboard
-- ESP32 integration with ultrasound sensors and LED indicators
+- ESP32 integration with ultrasonic sensors and LED indicators
 - Automated monthly status report emails (using SendGrid + GitHub Actions)
 - Google Sheets integration for external log visibility
 
@@ -89,9 +94,10 @@ We do not use a .env file locally to store any secret keys etc. Instead all envi
 
 uvicorn Backend.main:app --reload
 
-The dashboard and API will now be available:
+The local dashboard will now be available:
 - Dashboard: `http://127.0.0.1:8000/`
-- Swagger Docs: `http://127.0.0.1:8000/docs`
+
+In our case, and when running through render, is is available on: https://amac.onredner.com/
 
 ## Monthly Email Reporting
 
@@ -117,11 +123,10 @@ The dashboard is a static HTML page served directly from the backend. It:
 The dashboard is located in `Backend/static/index.html` and requires no additional setup.
 
 ## ESP32 Integration
-
 Each ESP32 microcontroller:
 
 - Connects to Wi-Fi and sends POST requests to the backend
-- Reads distance data using an HC-SR04 ultrasonic sensor
+- Reads data using an HC-SR04 ultrasonic sensor
 - Controls red/green LEDs to provide local status feedback
 - Operates independently, requiring no central coordination
 - ESP32 firmware is developed using PlotformIO 
@@ -129,12 +134,11 @@ Each ESP32 microcontroller:
 #### Steps to Upload Firmware:
 1. Install PlatformIO:
    pip install platformio
-   cd multi_hc-sr04_sensor_setup
+   cd <desired project>
    pio run --target upload
    pio device monitor
 
 ## Technology Stack
-
 - Python 3.11+
 - FastAPI
 - SQLAlchemy
@@ -146,24 +150,14 @@ Each ESP32 microcontroller:
 - GitHub Actions
 
 ## Functional Highlights
-
 - Real time drawer status via HTTP API
 - Low latency polling dashboard with no frontend framework
 - Scalable backend
 - Scheduled email reports without maintaining an internal scheduler
-- External logging without granting access to database or server
 
 ## Usage Notes
-
-- The system is designed for indoor environments like university labs
 - Network connectivity is assumed for both ESP32 devices and the backend
 - For production use, security features such as authentication and HTTPS should be added
 
 ## License
-
 This project was developed for academic purposes. License and reuse terms can be added here as needed.
-
-<!-- This README file was developed to document the ESP32 Drawer Monitoring System. -->
-<!-- We have used AI, specifically OpenAI's ChatGPT, to assist with refining the structure, -->
-<!-- improving readability, including comments, and ensuring consistency in the documentation. -->
-<!-- All content complies with ITU's instructions regarding Generative AI. -->

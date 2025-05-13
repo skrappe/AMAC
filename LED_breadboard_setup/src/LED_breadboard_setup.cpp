@@ -1,3 +1,8 @@
+// This file contains the firmware for the LED breadboard setup in the ESP32 Drawer Monitoring System.
+// We have used AI, specifically OpenAI's ChatGPT, to assist with refining the structure of the code
+// and ensuring consistency in comments and documentation.
+// All code complies with ITU's instructions regarding Generative AI.
+
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
@@ -138,10 +143,3 @@ void loop()
 
   delay(5000); // Wait 5 seconds before next check
 }
-
-
-
-// This file contains the firmware for the LED breadboard setup in the ESP32 Drawer Monitoring System.
-// We have used AI, specifically OpenAI's ChatGPT, to assist with refining the structure of the code
-// and ensuring consistency in comments and documentation.
-// All code complies with ITU's instructions regarding Generative AI.
