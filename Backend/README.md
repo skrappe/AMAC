@@ -165,5 +165,5 @@ This project was developed for academic purposes. License and reuse terms can be
 
 <!-- This README file was developed to document the ESP32 Drawer Monitoring System. -->
 <!-- We have used AI, specifically OpenAI's ChatGPT, to assist with refining the structure, -->
-<!-- improving readability, and ensuring consistency in the documentation. -->
+<!-- improving readability, including comments, and ensuring consistency in the documentation. -->
 <!-- All content complies with ITU's instructions regarding Generative AI. -->
